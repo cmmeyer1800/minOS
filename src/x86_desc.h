@@ -118,11 +118,71 @@ extern uint16_t ldt_desc;
 extern uint32_t ldt_size;
 extern seg_desc_t ldt_desc_ptr;
 extern seg_desc_t gdt_ptr;
+extern seg_desc_t gdt_desc_ptr;
 extern uint32_t ldt;
 
 extern uint32_t tss_size;
 extern seg_desc_t tss_desc_ptr;
 extern tss_t tss;
+
+typedef union pde_kb_t {
+    uint32_t val;
+    struct {
+        uint32_t present          : 1;
+        uint32_t read_write       : 1;
+        uint32_t user_supervisor  : 1;
+        uint32_t write_through    : 1;
+        uint32_t cache_disable    : 1;
+        uint32_t accessed         : 1;
+        uint32_t available_0      : 1;
+        uint32_t page_size        : 1;
+        uint32_t available_4_1    : 4;
+        uint32_t addr_31_12       : 20;
+    } __attribute__ ((packed));
+} pde_kb_t;
+
+typedef union pde_mb_t {
+    uint32_t val;
+    struct {
+            uint32_t present          : 1;
+            uint32_t read_write       : 1;
+            uint32_t user_supervisor  : 1;
+            uint32_t write_through    : 1;
+            uint32_t cache_disable    : 1;
+            uint32_t accessed         : 1;
+            uint32_t dirty            : 1;
+            uint32_t page_size        : 1;
+            uint32_t global           : 1;
+            uint32_t available        : 3;
+            uint32_t att_table        : 1;
+            uint32_t addr_39_32       : 8;
+            uint32_t rsvd             : 1;
+            uint32_t addr_31_22       : 10;
+    } __attribute__ ((packed));
+} pde_mb_t;
+
+typedef union pde_t {
+    pde_kb_t pde_kb;
+    pde_mb_t pde_mb;
+} pde_t;
+
+/* This is a page table entry. */
+typedef union pte_t {
+        uint32_t val;
+        struct {
+            uint16_t present          : 1;
+            uint16_t read_write       : 1;
+            uint16_t user_supervisor  : 1;
+            uint16_t write_through    : 1;
+            uint16_t cache_disable    : 1;
+            uint16_t accessed         : 1;
+            uint16_t dirty            : 1;
+            uint16_t att_table        : 1;
+            uint16_t global           : 1;
+            uint16_t available        : 3;
+            uint32_t addr_31_12       : 20;
+        } __attribute__ ((packed));
+} pte_t;
 
 /* Sets runtime-settable parameters in the GDT entry for the LDT */
 #define SET_LDT_PARAMS(str, addr, lim)                          \
@@ -217,3 +277,4 @@ do {                                    \
 #endif /* ASM */
 
 #endif /* _x86_DESC_H */
+

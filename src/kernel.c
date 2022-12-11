@@ -5,12 +5,13 @@
 #include "multiboot.h"
 #include "x86_desc.h"
 #include "lib.h"
-#include "i8259.h"
 #include "debug.h"
 #include "tests.h"
 #include "mem/paging.h"
+#include "interrupts/i8259.h"
+#include "interrupts/idt.h"
 
-#define RUN_TESTS 0
+#define RUN_TESTS 1
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -137,20 +138,16 @@ void entry(unsigned long magic, unsigned long addr) {
         ltr(KERNEL_TSS);
     }
 
-    init_paging();
+    init_idt();
 
-    /* Init the PIC */
     i8259_init();
 
-    /* Initialize devices, memory, filesystem, enable device interrupts on the
-     * PIC, any other initialization stuff... */
+    init_paging();
 
-    /* Enable interrupts */
-    /* Do not enable the following until after you have set up your
-     * IDT correctly otherwise QEMU will triple fault and simple close
-     * without showing you any output */
-    /*printf("Enabling Interrupts\n");
-    sti();*/
+    printf("Enabling Interrupts\n");
+    sti();
+
+    reset_screen();
 
 #if RUN_TESTS
     /* Run tests */

@@ -114,3 +114,7 @@ source/
 
 *.img
 bootimg
+
+.vscode/
+cifs5f32
+Makefile.dep

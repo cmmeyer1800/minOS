@@ -2,6 +2,7 @@
  * vim:ts=4 noexpandtab */
 
 #include "lib.h"
+#include "types.h"
 
 #define VIDEO       0xB8000
 #define NUM_COLS    80
@@ -11,6 +12,7 @@
 static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
+
 
 /* void clear(void);
  * Inputs: void
@@ -23,6 +25,34 @@ void clear(void) {
         *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
     }
 }
+
+
+/* void set_screen_pos(int32_t x, int32_t y);
+ * Inputs: x -> new x position
+           y -> new y position
+ * Return Value: none
+ * Function: Changes video memory write position */
+void set_screen_pos(int32_t x, int32_t y){
+    // Check for out of bounds new x and new y
+    if(x < 0 || y < 0 || x > NUM_COLS || y > NUM_ROWS) return;
+
+    // Update global position
+    screen_x = x;
+    screen_y = y;
+
+    return;
+}
+
+
+/* void reset_screen(void);
+ * Inputs: void
+ * Return Value: none
+ * Function: Clears video memory and sets position to top left */
+void reset_screen(void){
+    clear();
+    set_screen_pos(0, 0);
+}
+
 
 /* Standard printf().
  * Only supports the following format strings:
